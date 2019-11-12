@@ -1,6 +1,6 @@
 # Spring Boot Security Authorization
 
-## This POC includes in-memory authentication using hard coded user in the code[BAD]
+## This POC includes in-memory authentication using default schema and hard coded user in the code[BAD]
 
 ```java
 @EnableWebSecurity
