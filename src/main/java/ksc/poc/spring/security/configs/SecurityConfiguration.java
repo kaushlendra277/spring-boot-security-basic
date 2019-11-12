@@ -1,5 +1,8 @@
 package ksc.poc.spring.security.configs;
 
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -9,17 +12,24 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.fasterxml.jackson.databind.introspect.WithMember;
-
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
+	/***
+	 * - For In memory authentication it is not required.
+	 * - For In memory database authentication it is required, but no external configuration required
+	 */
+	@Autowired
+	private DataSource dataSource;
+	
 	// AUTHENTICATION
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		// TODO Auto-generated method stub
 		// uncomment this if you want the only default user from application.properties file
 		// super.configure(auth);
+		
+		// way 1 - in memory authentication
+		/*
 		auth
 			.inMemoryAuthentication()
 			.withUser("user").password("admin").roles("USER")
@@ -29,15 +39,30 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 						.password("admin")
 						.roles("ADMIN"))
 			;
+		*/
 		
+		// way 2 - using jdbc authentication
+		// in case of any confusion refer notes
+		auth
+			.jdbcAuthentication() // jdbc authentication
+			.dataSource(dataSource)
+			.withDefaultSchema() // Spring sec default schema 
+			.withUser(User.withUsername("user").password("admin").roles("USER")) // record 1 in default spring schema
+			.withUser(User.withUsername("admin").password("admin").roles("ADMIN")) // record 2 in default spring schema
+			;
 	}
 	
 	
-	// AUTHORIZATION
+	/***
+	 *  AUTHORIZATION
+	 *  
+	 *  Note :  Order of ant matcher is imp, 
+	 *  it **MUST** be from least privileged role to highest privileged role 
+	 */
+	// 
+	// 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		// TODO Auto-generated method stub
-		// super.configure(http);
 		http.authorizeRequests()
 		.antMatchers("/admin").hasRole("ADMIN") // admin apis- all path in the current level for ADMIN role user
 		.antMatchers("/user").hasAnyRole("USER","ADMIN") // user apis- all path in the current level for USER and ADMIN role user
