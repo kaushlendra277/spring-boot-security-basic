@@ -52,12 +52,30 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 			.withUser(User.withUsername("admin").password("admin").roles("ADMIN")) // record 2 in default spring schema
 			;
 		*/
+		
 		// way 3 - using jdbc authentication with configured schema(schema.sql) and configured users(data.sql)
 		// in case of any confusion refer notes
+		/*
 		auth
 			.jdbcAuthentication() // jdbc authentication
 			.dataSource(dataSource)
 			;
+		*/
+		
+		// way 4 - using jdbc authentication with configured schema(schema.sql) and configured users(data.sql)
+		// where we have pre existing user table not the default spring sec table
+		// in case of any confusion refer notes
+		auth
+			.jdbcAuthentication() // jdbc authentication
+			.dataSource(dataSource)
+			.usersByUsernameQuery("SELECT username, password,enabled"
+					+ " FROM users"
+					+ " WHERE username  = ?")
+			.authoritiesByUsernameQuery(" SELECT username, authority"
+					+ " FROM authorities"
+					+ " WHERE username  = ? ")
+			;
+		
 	}
 	
 	
