@@ -5,8 +5,11 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import com.fasterxml.jackson.databind.introspect.WithMember;
 
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
@@ -19,9 +22,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		// super.configure(auth);
 		auth
 			.inMemoryAuthentication()
-			.withUser("ksc2").password("admin2").roles("USER")
+			.withUser("user").password("admin").roles("USER")
 			.and()
-			.withUser("ksc3").password("admin3").roles("ADMIN")
+			.withUser(User
+						.withUsername("admin")
+						.password("admin")
+						.roles("ADMIN"))
 			;
 		
 	}
@@ -40,8 +46,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		// .hasAnyRole("ADMIN")
 		.and().formLogin(); // ?
 	}
-
-
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
