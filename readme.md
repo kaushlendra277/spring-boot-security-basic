@@ -1,6 +1,6 @@
 # Spring Boot Security Authorization
 
-## This POC includes in-memory authentication using default schema[BAD] and hard coded user in the code[BAD]
+## This POC includes in-memory authentication using default schema[BAD] and default user from the sql fils [Recommended over hard coding]
 
 ```java
 @EnableWebSecurity
@@ -20,9 +20,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		auth
 			.jdbcAuthentication() // jdbc authentication
 			.dataSource(dataSource)
-			.withDefaultSchema() // Spring sec default schema 
-			.withUser(User.withUsername("user").password("admin").roles("USER")) // record 1 in default spring schema
-			.withUser(User.withUsername("admin").password("admin").roles("ADMIN")) // record 2 in default spring schema
 			;
 	}
 	
@@ -55,6 +52,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 }
 
 ```
+
+## Ques - 
+In the classpath data.sql file we insert authorities as ROLE_USER, ROLE_ADMIN <br />
+But in the SecurityConfiguration we give access to the rols USER , ADMIN <by />
+How does it works ?
 
 ## POC endpoints
 http://localhost:8080 - unauthenticated user<br />

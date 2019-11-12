@@ -41,14 +41,22 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 			;
 		*/
 		
-		// way 2 - using jdbc authentication
+		// way 2 - using jdbc authentication with default schema and hard coded users
 		// in case of any confusion refer notes
+		/*
 		auth
 			.jdbcAuthentication() // jdbc authentication
 			.dataSource(dataSource)
 			.withDefaultSchema() // Spring sec default schema 
 			.withUser(User.withUsername("user").password("admin").roles("USER")) // record 1 in default spring schema
 			.withUser(User.withUsername("admin").password("admin").roles("ADMIN")) // record 2 in default spring schema
+			;
+		*/
+		// way 3 - using jdbc authentication with configured schema(schema.sql) and configured users(data.sql)
+		// in case of any confusion refer notes
+		auth
+			.jdbcAuthentication() // jdbc authentication
+			.dataSource(dataSource)
 			;
 	}
 	
