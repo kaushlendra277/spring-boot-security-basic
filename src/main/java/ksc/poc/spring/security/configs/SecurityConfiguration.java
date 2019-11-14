@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import ksc.poc.spring.security.service.IMyUserDetailsService;
+
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
@@ -26,7 +28,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	 * We can implement this interface to config our own implementation
 	 */
 	@Autowired
-	private UserDetailsService userDetailsService;
+	private IMyUserDetailsService myUserDetailsService;
 	
 	// AUTHENTICATION
 	@Override
@@ -88,7 +90,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		// where we have pre existing user table not the default spring sec table
 		// in case of any confusion refer notes
 		auth
-			.userDetailsService(userDetailsService)
+			.userDetailsService(myUserDetailsService)
 			;
 	}
 	
@@ -104,7 +106,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests()
-		.antMatchers("/admin").hasRole("ADMIN") // admin apis- all path in the current level for ADMIN role user
+		.antMatchers("/admin/**").hasRole("ADMIN") // admin apis- all path in the current level( and since we have used /** all sub path of /admin ) for ADMIN role user
 		.antMatchers("/user").hasAnyRole("USER","ADMIN") // user apis- all path in the current level for USER and ADMIN role user
 		.antMatchers("/").permitAll() // all path in the current level of any role
 		// .antMatchers("/**") // all path in the current level and sub path

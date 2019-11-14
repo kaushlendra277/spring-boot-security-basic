@@ -3,7 +3,7 @@
 ## This POC includes in-memory authentication using JPA <br>
 where a **userss** table created using JPA <br />
 and default user using UserRepository in "SpringBootSecurityApplication.java" <br/>
-We have implemented spring's UserDetailsService as "MyUserDetailsService" and use it in Authentication i.e. configure(AuthenticationManagerBuilder auth) as shown below.<br />
+We have extended spring's UserDetailsService as "IMyUserDetailsService" and use it in Authentication i.e. configure(AuthenticationManagerBuilder auth) as shown below.<br />
 
 ### Important Java classes for this POC
 1. MyUserDetailsService implements UserDetailsService
