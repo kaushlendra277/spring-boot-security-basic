@@ -1,14 +1,13 @@
 package ksc.poc.spring.security.configs;
 
-import javax.sql.DataSource;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -19,8 +18,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	 * - For In memory authentication it is not required.
 	 * - For In memory database authentication it is required, but no external configuration required
 	 */
+	//@Autowired
+	//private DataSource dataSource;
+	
+	/***
+	 * This is Spring provide interface
+	 * We can implement this interface to config our own implementation
+	 */
 	@Autowired
-	private DataSource dataSource;
+	private UserDetailsService userDetailsService;
 	
 	// AUTHENTICATION
 	@Override
@@ -41,7 +47,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 			;
 		*/
 		
-		// way 2 - using jdbc authentication with default schema and hard coded users
+		// way 2 - using in-memory database and jdbc authentication with default schema and hard coded users
 		// in case of any confusion refer notes
 		/*
 		auth
@@ -53,7 +59,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 			;
 		*/
 		
-		// way 3 - using jdbc authentication with configured schema(schema.sql) and configured users(data.sql)
+		// way 3 - using in-memory database and jdbc authentication with configured schema(schema.sql) and configured users(data.sql)
 		// in case of any confusion refer notes
 		/*
 		auth
@@ -62,9 +68,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 			;
 		*/
 		
-		// way 4 - using jdbc authentication with configured schema(schema.sql) and configured users(data.sql)
+		// way 4 - using in-memory database  and jdbc  authentication with configured schema(schema.sql) and configured users(data.sql)
 		// where we have pre existing user table not the default spring sec table
 		// in case of any confusion refer notes
+		/*
 		auth
 			.jdbcAuthentication() // jdbc authentication
 			.dataSource(dataSource)
@@ -75,7 +82,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 					+ " FROM authorities"
 					+ " WHERE username  = ? ")
 			;
+		*/
 		
+		// way 5 - using sql database  and jdbc  authentication with configured schema(schema.sql) and configured users(data.sql)
+		// where we have pre existing user table not the default spring sec table
+		// in case of any confusion refer notes
+		auth
+			.userDetailsService(userDetailsService)
+			;
 	}
 	
 	
@@ -97,6 +111,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		// .hasAnyRole("ADMIN")
 		.and().formLogin(); // ?
 	}
+	
+	
+
+	@Override
+	public void configure(WebSecurity web) {
+		web.ignoring().antMatchers("/h2-console/**");
+	}
+
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {

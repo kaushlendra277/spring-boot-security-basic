@@ -1,16 +1,27 @@
 # Spring Boot Security Authorization
 
-## This POC includes in-memory authentication using any schema[REcommended] and default user from the sql fils [Recommended over hard coding]
+## This POC includes in-memory authentication using JPA <br>
+where a **userss** table created using JPA <br />
+and default user using UserRepository in "SpringBootSecurityApplication.java" <br/>
+We have implemented spring's UserDetailsService as "MyUserDetailsService" and use it in Authentication i.e. configure(AuthenticationManagerBuilder auth) as shown below.<br />
+
+### Important Java classes for this POC
+1. MyUserDetailsService implements UserDetailsService
+2. MyUserDetails *our own class*
+3. UserDetails *spring's *
 
 ```java
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+	
+
+	/
 	/***
-	 * 
-	 * - For In memory database authentication it is required, but no external configuration required
+	 * This is Spring provide interface
+	 * We can implement this interface to config our own implementation
 	 */
 	@Autowired
-	private DataSource dataSource;
+	private UserDetailsService userDetailsService;
 	
 	// AUTHENTICATION
 	@Override
@@ -31,7 +42,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 			;
 		*/
 		
-		// way 2 - using jdbc authentication with default schema and hard coded users
+		// way 2 - using in-memory database and jdbc authentication with default schema and hard coded users
 		// in case of any confusion refer notes
 		/*
 		auth
@@ -43,7 +54,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 			;
 		*/
 		
-		// way 3 - using jdbc authentication with configured schema(schema.sql) and configured users(data.sql)
+		// way 3 - using in-memory database and jdbc authentication with configured schema(schema.sql) and configured users(data.sql)
 		// in case of any confusion refer notes
 		/*
 		auth
@@ -52,9 +63,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 			;
 		*/
 		
-		// way 4 - using jdbc authentication with configured schema(schema.sql) and configured users(data.sql)
+		// way 4 - using in-memory database  and jdbc  authentication with configured schema(schema.sql) and configured users(data.sql)
 		// where we have pre existing user table not the default spring sec table
 		// in case of any confusion refer notes
+		/*
 		auth
 			.jdbcAuthentication() // jdbc authentication
 			.dataSource(dataSource)
@@ -65,8 +77,51 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 					+ " FROM authorities"
 					+ " WHERE username  = ? ")
 			;
+		*/
 		
+		// way 5 - using sql database  and jdbc  authentication with configured schema(schema.sql) and configured users(data.sql)
+		// where we have pre existing user table not the default spring sec table
+		// in case of any confusion refer notes
+		auth
+			.userDetailsService(userDetailsService)
+			;
+	}
 	
+	
+	/***
+	 *  AUTHORIZATION
+	 *  
+	 *  Note :  Order of ant matcher is imp, 
+	 *  it **MUST** be from least privileged role to highest privileged role 
+	 */
+	// 
+	// 
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		http.authorizeRequests()
+		.antMatchers("/admin").hasRole("ADMIN") // admin apis- all path in the current level for ADMIN role user
+		.antMatchers("/user").hasAnyRole("USER","ADMIN") // user apis- all path in the current level for USER and ADMIN role user
+		.antMatchers("/").permitAll() // all path in the current level of any role
+		// .antMatchers("/**") // all path in the current level and sub path
+		// .hasAnyRole("ADMIN")
+		.and().formLogin(); // ?
+	}
+	
+	
+
+	@Override
+	public void configure(WebSecurity web) {
+		web.ignoring().antMatchers("/h2-console/**");
+	}
+
+
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		// NoOpPasswordEncoder takes userid and password as String
+		return NoOpPasswordEncoder.getInstance();
+	}
+
+
 	}
 	
 	
