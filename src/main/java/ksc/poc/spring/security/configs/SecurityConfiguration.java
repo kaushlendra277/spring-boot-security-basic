@@ -2,15 +2,19 @@ package ksc.poc.spring.security.configs;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import ksc.poc.spring.security.jwt.filters.JwtRequestFilter;
 import ksc.poc.spring.security.service.IMyUserDetailsService;
 
 @EnableWebSecurity
@@ -29,6 +33,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	 */
 	@Autowired
 	private IMyUserDetailsService myUserDetailsService;
+	
+	@Autowired
+	private JwtRequestFilter jwtRequestFilter;
 	
 	// AUTHENTICATION
 	@Override
@@ -105,6 +112,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	// 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
+		/*
 		http.authorizeRequests()
 		.antMatchers("/admin/**").hasRole("ADMIN") // admin apis- all path in the current level( and since we have used /** all sub path of /admin ) for ADMIN role user
 		.antMatchers("/user").hasAnyRole("USER","ADMIN") // user apis- all path in the current level for USER and ADMIN role user
@@ -112,6 +120,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		// .antMatchers("/**") // all path in the current level and sub path
 		// .hasAnyRole("ADMIN")
 		.and().formLogin(); // ?
+		*/
+		
+		http.csrf().disable()
+			.authorizeRequests()
+				.antMatchers("/authenticate").permitAll() // whitelist this
+				.anyRequest().authenticated() // authenticate all others
+			.and()
+				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		
+		http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 	}
 	
 	
@@ -127,5 +145,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		// NoOpPasswordEncoder takes userid and password as String
 		return NoOpPasswordEncoder.getInstance();
 	}
+
+
+	@Override
+	@Bean
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+		return super.authenticationManagerBean();
+	}
+	
+	
 
 }
