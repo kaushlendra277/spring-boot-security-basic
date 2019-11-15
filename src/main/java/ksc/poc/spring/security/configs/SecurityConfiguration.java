@@ -125,6 +125,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		http.csrf().disable()
 			.authorizeRequests()
 				.antMatchers("/authenticate").permitAll() // whitelist this
+				.antMatchers("/admin/**").hasRole("ADMIN")
 				.anyRequest().authenticated() // authenticate all others
 			.and()
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
