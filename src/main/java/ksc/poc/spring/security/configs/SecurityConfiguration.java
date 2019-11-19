@@ -28,7 +28,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	//private DataSource dataSource;
 	
 	/***
-	 * This is Spring provide interface
+	 * This is the child of  Spring provide interface
 	 * We can implement this interface to config our own implementation
 	 */
 	@Autowired

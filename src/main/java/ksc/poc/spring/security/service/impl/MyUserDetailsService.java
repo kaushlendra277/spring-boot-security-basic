@@ -18,10 +18,14 @@ public class MyUserDetailsService implements IMyUserDetailsService {
 	@Autowired
 	private UserRepository userRepository;
 	
+	/***
+	 * This method is automatically called by Spring
+	 * whenever any user tries to login
+	 */
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		Optional<User> oUser = userRepository.findByUserName(username);
-		oUser.orElseThrow(() ->new UsernameNotFoundException("INNVALID USER"));
+		oUser.orElseThrow(() ->new UsernameNotFoundException("INVALID USER"));
 		return oUser.map(MyUserDetails:: new).get();
 	}
 
