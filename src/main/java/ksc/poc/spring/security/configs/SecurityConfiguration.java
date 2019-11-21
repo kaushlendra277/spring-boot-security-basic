@@ -52,9 +52,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		.antMatchers("/").permitAll() // all path in the current level of any role
 		// .antMatchers("/**") // all path in the current level and sub path
 		// .hasAnyRole("ADMIN")
-		.and().formLogin()
-		// .httpBasic() -- it gives basic authentication
-		// .formLogin() - it gives session kind of funtionality[PREFERRED since it provide logout] // ?
+		.and()
+		.httpBasic() // -- it gives basic authentication
+		//.formLogin() //- it gives session kind of funtionality[PREFERRED since it provide logout] // ?
 		;
 	}
 
