@@ -23,17 +23,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		// super.configure(auth);
 		auth
 			.inMemoryAuthentication()
-			.withUser("user").password("admin").authorities(ACCESS_TEST1_AUTHORITY).roles("USER") // even on adding ACCESS_TEST1_AUTHORITY spring is not able to call "/user" api ?
-			.and()
-			.withUser("test1").password("admin").roles("USER").authorities(ACCESS_TEST1_AUTHORITY) // even on adding .role spring is not able to call "/user" api ?
-			.and()
-			.withUser("test2").password("admin").roles("USER").authorities(ACCESS_TEST1_AUTHORITY, ACCESS_TEST2_AUTHORITY) // even on adding .role spring is not able to call "/user" api ?
+			//.withUser("user").password("admin").authorities(ACCESS_TEST1_AUTHORITY).roles("USER") // even on adding ACCESS_TEST1_AUTHORITY spring is not able to call "/user" api ?
+			.withUser("user").password("admin").authorities(ACCESS_TEST1_AUTHORITY, "ROLE_USER") // when we define authorities it override roles hence we need to add role with authorities by prefixing as ROLE_
 			.and()
 			.withUser(User
 						.withUsername("admin")
 						.password("admin")
-						.authorities(ACCESS_TEST1_AUTHORITY,ACCESS_TEST2_AUTHORITY)
-						.roles("ADMIN"))
+						.authorities(ACCESS_TEST1_AUTHORITY,ACCESS_TEST2_AUTHORITY,"ROLE_ADMIN"))
+						// .roles("ADMIN")) // when we define authorities it override roles hence we need to add role with authorities by prefixing as ROLE_
 			;
 		
 	}
@@ -53,8 +50,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		// .antMatchers("/**") // all path in the current level and sub path
 		// .hasAnyRole("ADMIN")
 		.and()
-		.httpBasic() // -- it gives basic authentication
-		//.formLogin() //- it gives session kind of funtionality[PREFERRED since it provide logout] // ?
+		//.httpBasic() // -- it gives basic authentication
+		.formLogin() //- it gives session kind of funtionality[PREFERRED since it provide logout] // ?
 		;
 	}
 
