@@ -3,6 +3,7 @@ package ksc.poc.spring.security.configs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -96,9 +97,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		// way 5 - using sql database  and jdbc  authentication with configured schema(schema.sql) and configured users(data.sql)
 		// where we have pre existing user table not the default spring sec table
 		// in case of any confusion refer notes
+		/*
 		auth
 			.userDetailsService(myUserDetailsService)
+			.passwordEncoder(passwordEncoder());
 			;
+			*/
+		// way 6 - almost same as way 5 only dfference is here we used DaoAuthenticationProvider to abstract configuration like encoder and userdetails service
+		auth
+			.authenticationProvider(authenticationProvider())
+		;
 	}
 	
 	
@@ -154,6 +162,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		return super.authenticationManagerBean();
 	}
 	
-	
-
+	@Bean
+	public DaoAuthenticationProvider authenticationProvider() {
+		DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+		provider.setPasswordEncoder(passwordEncoder());
+		provider.setUserDetailsService(myUserDetailsService);
+		return provider;
+	}
 }
